@@ -1,7 +1,7 @@
 import Foundation
 
 public class Node {
-    let parentNode: Node?
+    public let parentNode: Node?
 
     public var childNodes = [Node]()
 
