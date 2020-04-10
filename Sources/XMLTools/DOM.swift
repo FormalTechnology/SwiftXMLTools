@@ -45,10 +45,9 @@ public class NamedNode: Node {
 }
 
 public class Attribute: NamedNode {
-    public let value: String?
+    public var value: String?
 
     override init (parent: Node, name: QName) {
-        self.value = nil
         super.init(parent: parent, name: name)
     }
     init (parent: Node, name: QName, value: String) {
