@@ -51,4 +51,19 @@ class DOMTests: XCTestCase {
         }
         XCTAssertTrue(handler.names.contains(QName("Name", uri: "http://uri.etsi.org/02231/v2#")))
     }
+
+    func testNodeMutation() {
+        let doc = XMLTools.Document()
+        let root = doc.appendElement("root")
+        let book = root.appendElement("book")
+        book.appendAttribute("name", withValue: "The Hobbit")
+
+        XCTAssertEqual(book.name(), QName("book"))
+        XCTAssertEqual(book.attributes[QName("name")]?.value, "The Hobbit")
+
+        book.setName(QName("novel"))
+        XCTAssertEqual(book.name(), QName("novel"))
+        XCTAssertEqual(book.attributes[QName("name")]?.value, "The Hobbit")
+    }
+
 }

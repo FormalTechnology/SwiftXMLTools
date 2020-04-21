@@ -26,7 +26,7 @@ public class Node {
 }
 
 public class NamedNode: Node {
-    let nodeName: QName
+    private(set) var nodeName: QName
 
     internal init (name: QName) {
         self.nodeName = name
@@ -42,6 +42,9 @@ public class NamedNode: Node {
         return nodeName
     }
 
+    public func setName (_ name: QName) {
+        nodeName = name
+    }
 }
 
 public class Attribute: NamedNode {
