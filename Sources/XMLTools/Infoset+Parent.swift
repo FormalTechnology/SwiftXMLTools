@@ -14,6 +14,6 @@ extension Infoset {
                 return Infoset(parentNode)
             }
         }
-        return Infoset()
+        return Infoset(from: parentDocument)
     }
 }

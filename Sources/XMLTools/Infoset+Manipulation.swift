@@ -31,7 +31,7 @@ extension Infoset {
                 return Infoset(newElement)
             }
         }
-        return Infoset()
+        return Infoset(from: parentDocument)
     }
 
     /**
