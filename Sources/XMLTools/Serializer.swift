@@ -252,7 +252,7 @@ class Serializer: DefaultDocumentHandler {
 
 extension Document {
 
-    public func data(_ options: SerializerOption) -> Data? {
+    public func data(_ options: SerializerOption = []) -> Data? {
         let serializer = Serializer(options)
         do {
             try traverse(serializer)
