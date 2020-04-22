@@ -71,7 +71,7 @@ class BuilderTests: XCTestCase {
                 .appendElement("pages").manipulate { $0.intValue = book.pages }
         }
 
-        let xmlData = builtXML.document().data(.indent, .omitXMLDeclaration)
+        let xmlData = builtXML.document().data([.indent, .omitXMLDeclaration])
 
         print( String(data: xmlData!, encoding: .utf8)! )
 
