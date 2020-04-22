@@ -7,9 +7,15 @@
 
 import Foundation
 
-public enum SerializerOption {
-    case indent
-    case omitXMLDeclaration
+public struct SerializerOption: OptionSet {
+    public let rawValue: Int
+
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
+    }
+
+    public static let indent = SerializerOption(rawValue: 1 << 0)
+    public static let omitXMLDeclaration = SerializerOption(rawValue: 1 << 1)
 }
 
 class Serializer: DefaultDocumentHandler {
@@ -35,7 +41,7 @@ class Serializer: DefaultDocumentHandler {
     private var optionIndent = false
     private var optionOmitXMLDeclaration = false
 
-    init (_ options: [SerializerOption]) {
+    init (_ options: SerializerOption) {
 
         if options.contains(.indent) {
             optionIndent = true
@@ -246,7 +252,7 @@ class Serializer: DefaultDocumentHandler {
 
 extension Document {
 
-    public func data(_ options: SerializerOption...) -> Data? {
+    public func data(_ options: SerializerOption = []) -> Data? {
         let serializer = Serializer(options)
         do {
             try traverse(serializer)
