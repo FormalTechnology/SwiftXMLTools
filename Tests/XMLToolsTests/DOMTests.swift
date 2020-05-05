@@ -52,7 +52,7 @@ class DOMTests: XCTestCase {
         XCTAssertTrue(handler.names.contains(QName("Name", uri: "http://uri.etsi.org/02231/v2#")))
     }
 
-    func testChildNodes() {
+    func testChildNodes() throws {
         let doc = XMLTools.Document()
         let root = doc.appendElement("root")
 
@@ -68,17 +68,25 @@ class DOMTests: XCTestCase {
 
         XCTAssertEqual(root.childNodes.count, 2)
 
-        root.childNodes.remove(at: 1)
+        root.remove(at: 1)
         XCTAssertEqual(root.childNodes.count, 1)
         XCTAssertNil(book2.parentNode)
 
-        root.childNodes[0] = book2
-        XCTAssertEqual(root.childNodes.count, 1)
+        try root.insert(book2, at: 0)
+        XCTAssertEqual(root.childNodes.count, 2)
         XCTAssertTrue(book2.parentNode === root)
+
+        book1.removeFromParent()
+        XCTAssertEqual(root.childNodes.count, 1)
         XCTAssertNil(book1.parentNode)
 
-        root.childNodes.removeAll()
+        try root.append(book1)
+        XCTAssertEqual(root.childNodes.count, 2)
+        XCTAssertTrue(book1.parentNode === root)
+
+        root.removeAll()
         XCTAssertTrue(root.childNodes.isEmpty)
+        XCTAssertNil(book1.parentNode)
         XCTAssertNil(book2.parentNode)
     }
 

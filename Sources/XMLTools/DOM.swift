@@ -1,5 +1,9 @@
 import Foundation
 
+public enum DOMError: Error {
+    case childNodeExists
+}
+
 public class Node {
     private(set) var parentNode: Node?
 
@@ -29,6 +33,22 @@ public class Node {
             node = node?.parentNode
         }
         return nil
+    }
+
+}
+
+extension Node {
+
+    public func index(of node: Node) -> Int? {
+        return childNodes.firstIndex { $0 === node }
+    }
+
+    public func removeFromParent() {
+        guard let idx = self.parentNode?.index(of: self) else {
+            return
+        }
+        // childNodes will unset self.parentNode
+        self.parentNode?.childNodes.remove(at: idx)
     }
 
 }
@@ -71,15 +91,6 @@ public class Element: NamedNode {
     internal var sourceNamespaceContext: NamespaceContext?
     // namespace context of the current document
     public var namespaceContext: NamespaceContext?
-    // childNodes is public write on Element.
-    override public var childNodes: [Node] {
-        get {
-            return super.childNodes
-        }
-        set {
-            super.childNodes = newValue
-        }
-    }
 
     @discardableResult
     public func appendElement(_ name: String) -> Element {
@@ -159,6 +170,39 @@ public class Element: NamedNode {
             element = element?.parentNode as? Element
         }
         return nil
+    }
+
+}
+
+extension Element {
+
+    public func insert(_ node: Node, at idx: Int) throws {
+        guard node.parentNode !== self else {
+            throw DOMError.childNodeExists
+        }
+        node.removeFromParent()
+        childNodes.insert(node, at: idx)
+    }
+
+    public func append(_ node: Node) throws {
+        guard node.parentNode !== self else {
+            throw DOMError.childNodeExists
+        }
+        node.removeFromParent()
+        childNodes.append(node)
+    }
+
+    @discardableResult
+    public func remove(at idx: Int) -> Node {
+        childNodes.remove(at: idx)
+    }
+
+    public func removeAll() {
+        childNodes.removeAll()
+    }
+
+    public func removeAll(where predicate: (Node) throws -> Bool) rethrows {
+        try childNodes.removeAll(where: predicate)
     }
 
 }
