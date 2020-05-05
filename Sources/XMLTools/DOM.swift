@@ -1,9 +1,20 @@
 import Foundation
 
-public class Node {
-    public let parentNode: Node?
+public enum DOMError: Error {
+    case childNodeExists
+}
 
-    public var childNodes = [Node]()
+public class Node {
+    public private(set) var parentNode: Node?
+
+    public internal(set) var childNodes = [Node]() {
+        willSet {
+            childNodes.forEach { $0.parentNode = nil }
+        }
+        didSet {
+            childNodes.forEach { $0.parentNode = self }
+        }
+    }
 
     init(parent: Node?) {
         self.parentNode = parent
@@ -23,6 +34,23 @@ public class Node {
         }
         return nil
     }
+
+}
+
+extension Node {
+
+    public func index(of node: Node) -> Int? {
+        return childNodes.firstIndex { $0 === node }
+    }
+
+    public func removeFromParent() {
+        guard let idx = self.parentNode?.index(of: self) else {
+            return
+        }
+        // childNodes will unset self.parentNode
+        self.parentNode?.childNodes.remove(at: idx)
+    }
+
 }
 
 public class NamedNode: Node {
@@ -146,6 +174,48 @@ public class Element: NamedNode {
         }
         return nil
     }
+
+}
+
+extension Element {
+
+    public func insert(_ node: Node, at idx: Int) throws {
+        guard node.parentNode !== self else {
+            throw DOMError.childNodeExists
+        }
+        node.removeFromParent()
+        childNodes.insert(node, at: idx)
+    }
+
+    public func append(_ node: Node) throws {
+        guard node.parentNode !== self else {
+            throw DOMError.childNodeExists
+        }
+        node.removeFromParent()
+        childNodes.append(node)
+    }
+
+    public func append(_ nodes: [Node]) throws {
+        guard nodes.allSatisfy({ $0.parentNode !== self }) else {
+            throw DOMError.childNodeExists
+        }
+        nodes.forEach { $0.removeFromParent() }
+        childNodes.append(contentsOf: nodes)
+    }
+
+    @discardableResult
+    public func remove(at idx: Int) -> Node {
+        childNodes.remove(at: idx)
+    }
+
+    public func removeAll() {
+        childNodes.removeAll()
+    }
+
+    public func removeAll(where predicate: (Node) throws -> Bool) rethrows {
+        try childNodes.removeAll(where: predicate)
+    }
+
 }
 
 public class TextNode: Node {

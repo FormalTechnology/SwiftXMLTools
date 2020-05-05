@@ -66,4 +66,42 @@ class DOMTests: XCTestCase {
         XCTAssertEqual(book.attributes[QName("name")]?.value, "The Hobbit")
     }
 
+    func testChildNodes() throws {
+        let doc = XMLTools.Document()
+        let root = doc.appendElement("root")
+
+        let book1 = root.appendElement("book")
+        book1.appendAttribute("name", withValue: "The Hobbit")
+        XCTAssertTrue(book1.parentNode === root)
+        XCTAssertTrue(book1 === root.childNodes[0])
+
+        let book2 = root.appendElement("book")
+        book2.appendAttribute("name", withValue: "Lord of the Rings")
+        XCTAssertTrue(book2.parentNode === root)
+        XCTAssertTrue(book2 === root.childNodes[1])
+
+        XCTAssertEqual(root.childNodes.count, 2)
+
+        root.remove(at: 1)
+        XCTAssertEqual(root.childNodes.count, 1)
+        XCTAssertNil(book2.parentNode)
+
+        try root.insert(book2, at: 0)
+        XCTAssertEqual(root.childNodes.count, 2)
+        XCTAssertTrue(book2.parentNode === root)
+
+        book1.removeFromParent()
+        XCTAssertEqual(root.childNodes.count, 1)
+        XCTAssertNil(book1.parentNode)
+
+        try root.append(book1)
+        XCTAssertEqual(root.childNodes.count, 2)
+        XCTAssertTrue(book1.parentNode === root)
+
+        root.removeAll()
+        XCTAssertTrue(root.childNodes.isEmpty)
+        XCTAssertNil(book1.parentNode)
+        XCTAssertNil(book2.parentNode)
+    }
+
 }
