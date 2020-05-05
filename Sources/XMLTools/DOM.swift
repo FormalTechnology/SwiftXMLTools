@@ -192,6 +192,14 @@ extension Element {
         childNodes.append(node)
     }
 
+    public func append(_ nodes: [Node]) throws {
+        guard nodes.allSatisfy({ $0.parentNode !== self }) else {
+            throw DOMError.childNodeExists
+        }
+        nodes.forEach { $0.removeFromParent() }
+        childNodes.append(contentsOf: nodes)
+    }
+
     @discardableResult
     public func remove(at idx: Int) -> Node {
         childNodes.remove(at: idx)
