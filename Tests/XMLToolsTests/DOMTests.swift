@@ -51,4 +51,35 @@ class DOMTests: XCTestCase {
         }
         XCTAssertTrue(handler.names.contains(QName("Name", uri: "http://uri.etsi.org/02231/v2#")))
     }
+
+    func testChildNodes() {
+        let doc = XMLTools.Document()
+        let root = doc.appendElement("root")
+
+        let book1 = root.appendElement("book")
+        book1.appendAttribute("name", withValue: "The Hobbit")
+        XCTAssertTrue(book1.parentNode === root)
+        XCTAssertTrue(book1 === root.childNodes[0])
+
+        let book2 = root.appendElement("book")
+        book2.appendAttribute("name", withValue: "Lord of the Rings")
+        XCTAssertTrue(book2.parentNode === root)
+        XCTAssertTrue(book2 === root.childNodes[1])
+
+        XCTAssertEqual(root.childNodes.count, 2)
+
+        root.childNodes.remove(at: 1)
+        XCTAssertEqual(root.childNodes.count, 1)
+        XCTAssertNil(book2.parentNode)
+
+        root.childNodes[0] = book2
+        XCTAssertEqual(root.childNodes.count, 1)
+        XCTAssertTrue(book2.parentNode === root)
+        XCTAssertNil(book1.parentNode)
+
+        root.childNodes.removeAll()
+        XCTAssertTrue(root.childNodes.isEmpty)
+        XCTAssertNil(book2.parentNode)
+    }
+
 }

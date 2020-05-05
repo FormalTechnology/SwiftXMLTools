@@ -1,9 +1,16 @@
 import Foundation
 
 public class Node {
-    let parentNode: Node?
+    private(set) var parentNode: Node?
 
-    public var childNodes = [Node]()
+    public internal(set) var childNodes = [Node]() {
+        willSet {
+            childNodes.forEach { $0.parentNode = nil }
+        }
+        didSet {
+            childNodes.forEach { $0.parentNode = self }
+        }
+    }
 
     init(parent: Node?) {
         self.parentNode = parent
@@ -23,6 +30,7 @@ public class Node {
         }
         return nil
     }
+
 }
 
 public class NamedNode: Node {
@@ -63,6 +71,15 @@ public class Element: NamedNode {
     internal var sourceNamespaceContext: NamespaceContext?
     // namespace context of the current document
     public var namespaceContext: NamespaceContext?
+    // childNodes is public write on Element.
+    override public var childNodes: [Node] {
+        get {
+            return super.childNodes
+        }
+        set {
+            super.childNodes = newValue
+        }
+    }
 
     @discardableResult
     public func appendElement(_ name: String) -> Element {
@@ -143,6 +160,7 @@ public class Element: NamedNode {
         }
         return nil
     }
+
 }
 
 public class TextNode: Node {
